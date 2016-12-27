@@ -1,31 +1,32 @@
-## read data from the UCI HAR Dataset
+## Part 1 - read data from the UCI HAR Dataset
 features <- read.table("UCI HAR Dataset/features.txt", row.names = 1)
 features <- features[, 1]
 
-#testData <- read.table("UCI HAR Dataset/test/X_test.txt", col.names=features)
-#testActivityData <- read.table("UCI HAR Dataset/test/y_test.txt", col.names="activityNum")
-#testSubjectData <- read.table("UCI HAR Dataset/test/subject_test.txt", col.names="subject")
+testData <- read.table("UCI HAR Dataset/test/X_test.txt", col.names=features)
+testActivityData <- read.table("UCI HAR Dataset/test/y_test.txt", col.names="activityNum")
+testSubjectData <- read.table("UCI HAR Dataset/test/subject_test.txt", col.names="subject")
   
-#trainData <- read.table("UCI HAR Dataset/train/X_train.txt", col.names=features)
-#trainActivityData <- read.table("UCI HAR Dataset/train/y_train.txt", col.names="activityNum")
-#trainSubjectData <- read.table("UCI HAR Dataset/train/subject_train.txt", col.names="subject")
+trainData <- read.table("UCI HAR Dataset/train/X_train.txt", col.names=features)
+trainActivityData <- read.table("UCI HAR Dataset/train/y_train.txt", col.names="activityNum")
+trainSubjectData <- read.table("UCI HAR Dataset/train/subject_train.txt", col.names="subject")
 
-## Combine the test and training data sets 
+# Combine the test and training data sets 
 data <- rbind(testData, trainData)
 activityData <- rbind(testActivityData, trainActivityData)
 subjectData <- rbind(testSubjectData, trainSubjectData)
 
-## Extract only the measurements on the mean and standard deviation for each measurement
+## Part 2 - Extract only the measurements on the mean and standard deviation for each measurement
 meanAndStdSelection <- grepl("mean\\(\\)|std\\(\\)", features)
 data <- data[, meanAndStdSelection]
 
-## Use descriptive activity names (i.e. WALKING, WALKING_UPSTAIRS, etc.)
+## Part 3 - Use descriptive activity names (i.e. WALKING, WALKING_UPSTAIRS, etc.)
 # Don't worry about subject data right now
 activityLabels <- read.table("UCI HAR Dataset/activity_labels.txt", col.names=c("activityNum", "activity"))
 mergedData <- cbind(activityData, data) 
 mergedData <- merge(activityLabels, mergedData, by="activityNum")
 
-## Tidy variable names 
+## Part 4 - Tidy variable names 
+# Hard code all of the t-feature names. Then modify these for the f-features
 tFeatures <- c("tBdAccXMean", 
               "tBdAccYMean",
               "tBdAccZMean",
@@ -75,7 +76,7 @@ fFeatures <- fFeatures[!grepl("^fBdGyJrk[XYZ]", fFeatures)]
 features <- c("activityNum", "activity", tFeatures, fFeatures)
 mergedData <- setNames(mergedData, features)
 
-## Average of each variable for each activity and each subject.
+## Part 5 - Average of each variable for each activity and each subject.
 # Merge subject data into mergedData data table 
 mergedData <- cbind(subjectData, mergedData) 
 
